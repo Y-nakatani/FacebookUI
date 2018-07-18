@@ -1,13 +1,21 @@
 <template lang="pug">
 .container
-  textarea.post-message(v-model="tweet")
+  textarea.post-message(v-model="tweet" placeholder="いまのキモチ。")
   div.postbutton
-    v-ons-button(@click="post()")
+    v-ons-button(@click="post()" modifier="cta")
       | post
-    .list-group
-      .list-item(v-for="t in timeline")
-        | {{t.tweet}}
-        | {{t.date}}
+    .nk-list-group
+      .nk-list-item(v-for="t in timeline")
+        div.nk-timeline-area
+          | {{t.tweet}}
+          | {{t.date}}
+        div.nk-les-post-area
+          input.nk-les-text-area(v-model="les" type="text")
+          button.nk-les-button(@click="lespost()")
+            |res
+          .nk-list-group
+            .nk-list-item(v-for="t in lesline")
+              | {{t.les}}
 </template>
 
 <style lang="sass">
@@ -15,12 +23,14 @@
     outline: none
   .container
     margin: 0 auto
-    width: 40em
+    width: 30em
   .post-message
-    width: 50em
-    height: 10em
-  .list-item
-    margin: 20px
+    margin: 10px 0 0 0
+    width: 40em
+    height: 6em
+    font-size: 10px
+  .nk-list-item
+    margin: 20px 0 0 0
     padding: 10px
     border: solid
     text-align: left
@@ -28,20 +38,15 @@
     border-radius: 10px
   .postbutton
     text-align: center
-  button
-    width: 100px
-    font-size: 15px
-    padding: 0.5em 1em
-    border: 0 none
-    padding-bottom: 1em
-    border-radius: 10px
-    overflow: hidden
-    text-decoration: none
-    background: skyblue
-    color: #fff
-    cursor: pointer
-    &:hover
-      background-color: orange
+  .nk-timeline-area
+    padding: 0 0 20px 0
+    border-bottom: solid 0.5px
+    border-color: inherit
+    margin: 0 0 10px 0
+  .nk-les-post-area
+    text-align: right
+  .nk-les-button
+    margin: 0 0 0 5px
 
 </style>
 
@@ -61,7 +66,10 @@ export default{
     return{
       tweet: '',
       tweetList: [],
-      timeline: []
+      timeline: [],
+      les: '',
+      lesline: [],
+      lesList: []
     }
   },
   methods: {
@@ -76,12 +84,27 @@ export default{
         this.clear()
       }
     },
+    lespost(){
+      if (this.isLesponsePresent()){
+        //console.log("lespost呼ばれたやで")
+        this.lesList.push({
+          les: this.les
+        })
+        this.lesline = this.lesreverse()
+        this.clear()
+      }
+    },
     clear(){
       this.tweet = ''
+      this.les = ''
     },
     reverse(){
       var copy = this.tweetList.slice()
       return copy.reverse()
+    },
+    lesreverse(){
+      var lescopy = this.lesList.slice()
+      return lescopy.reverse()
     },
     isTweetPresent() {
       return this.tweet !== ''
@@ -89,6 +112,9 @@ export default{
     tweetTime(){
       var date = moment()
       return date.format("HH:mm")
+    },
+    isLesponsePresent(){
+      return this.les !==''
     }
   }
 }
