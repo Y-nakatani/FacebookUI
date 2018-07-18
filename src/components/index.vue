@@ -5,17 +5,18 @@
     v-ons-button(@click="post()" modifier="cta")
       | post
     .nk-list-group
-      .nk-list-item(v-for="t in timeline")
+      .nk-list-item(v-for="(t, i) in timeline")
         div.nk-timeline-area
           | {{t.tweet}}
           | {{t.date}}
+          | {{i}}
         div.nk-les-post-area
-          input.nk-les-text-area(v-model="les" type="text")
-          button.nk-les-button(@click="lespost()")
+          input.nk-les-text-area(v-model="message[i]" type="text")
+          button.nk-les-button(@click="lespost(i)")
             |res
           .nk-list-group
-            .nk-list-item(v-for="t in lesline")
-              | {{t.les}}
+            .nk-list-item(v-for="l in t.lesList")
+              | {{l.les}}
 </template>
 
 <style lang="sass">
@@ -53,8 +54,6 @@
 <script>
 import moment from 'moment'
 // Webpack CSS import
-import 'onsenui/css/onsenui.css'
-import 'onsenui/css/onsen-css-components.css'
 // JS import
 import Vue from 'vue'
 import VueOnsen from 'vue-onsenui'
@@ -67,9 +66,7 @@ export default{
       tweet: '',
       tweetList: [],
       timeline: [],
-      les: '',
-      lesline: [],
-      lesList: []
+      message: []
     }
   },
   methods: {
@@ -77,34 +74,30 @@ export default{
       if (this.isTweetPresent()){
         this.tweetList.push({
           tweet: this.tweet,
-          date: this.tweetTime()
+          date: this.tweetTime(),
+          lesList: []
         })
-        //console.log(this.tweetList)
+        this.message.push('')
         this.timeline = this.reverse()
         this.clear()
       }
     },
-    lespost(){
+    lespost(index){
       if (this.isLesponsePresent()){
         //console.log("lespost呼ばれたやで")
-        this.lesList.push({
-          les: this.les
+        this.timeline[index].lesList.push({
+          les: this.message[index]
         })
-        this.lesline = this.lesreverse()
+        this.message[index] = ''
         this.clear()
       }
     },
     clear(){
       this.tweet = ''
-      this.les = ''
     },
     reverse(){
       var copy = this.tweetList.slice()
       return copy.reverse()
-    },
-    lesreverse(){
-      var lescopy = this.lesList.slice()
-      return lescopy.reverse()
     },
     isTweetPresent() {
       return this.tweet !== ''
@@ -114,7 +107,7 @@ export default{
       return date.format("HH:mm")
     },
     isLesponsePresent(){
-      return this.les !==''
+      return this.message !==''
     }
   }
 }
